@@ -7,25 +7,55 @@
 <i>{{ count }} posts saved</i>
 <i>presenting {{ posts|length }}</i>
 
-<br>
-<br>
-
-{% if page_no > 1 %}
-<a href="{{ url_for('uploader', uploader_name=uploader, page=1) }}">&lt;&lt; First</a>
-<a href="{{ url_for('uploader', uploader_name=uploader, page=page_no - 1) }}">&lt; Previous</a>
+<div class="page-nav">
+{% if page_no > 1 %}<a href="{{ url_for('uploader', uploader_name=uploader, mode=mode, page=page_no - 1) }}">&lt;</a>
+{% elif count > posts|length %}<a href="{{ url_for('uploader', uploader_name=uploader, mode=mode, page=page_max) }}">&gt;|</a>
 {% endif %}
 
-{% if page_max > page_no %}
-<a href="{{ url_for('uploader', uploader_name=uploader, page=page_no + 1) }}">Next &gt;</a>
-<a href="{{ url_for('uploader', uploader_name=uploader, page=page_max) }}">Last &gt;&gt;</a>
-{% endif %}
+<a href="{{ url_for('uploader', uploader_name=uploader, mode='full', page=page_no) }}">Full view</a>
+<a href="{{ url_for('uploader', uploader_name=uploader, mode='thumb', page=page_no) }}">Thumb view</a>
 
-<br>
-<br>
+{% if page_max > page_no %}<a href="{{ url_for('uploader', uploader_name=uploader, mode=mode, page=page_no + 1) }}">&gt;</a>
+{% elif page_no > 1 %}<a href="{{ url_for('uploader', uploader_name=uploader, mode=mode, page=1) }}">|&lt;</a>
+{% endif %}
+</div>
 
 <ul>
 	{% for post in posts %}
-	<!--<li><a href="{{ url_for('post', post_id=post.id) }}">{{ post.title }} by {{ post.uploader }}</a></li>-->
+	{% if mode == "full" %}
+	<div class="element-post-full">
+	
+	<div class="post-header">
+		<h2 class="title"><a href="{{ url_for('post', post_id=post.id) }}">
+		{{ post.title }}
+		</a></h2>
+		<a href="https://furaffinity.net/view/{{ post.id }}">VIew on FA</a>
+	</div>
+	
+	<img class="media-full" src="http://127.0.0.1:6771/image/{{ post.id }}.{{ post.ext }}" loading="lazy">
+	
+	<div class="post-info">
+	
+	<div class="desc">
+	{% if post.descwords > 450 %}
+	<details><summary>Description ({{ post.descwords }} words)</summary>
+	{% endif %}
+	{{ post.description | safe }}
+	</div>
+	
+	<ul class="link-things">
+		<span>Users:</span>
+		{% for user in post.users_mentioned %}
+        <li><a href="{{ url_for('uploader', uploader_name=user) }}">{{ user }}</a></li>{% endfor %}
+    </ul>
+	
+	<ul class="link-things">
+		<span>Tags:</span>{% for tag in post.tags %}
+        <li><a href="{{ url_for('tag', tag_name=tag) }}">{{ tag }}</a></li>{% endfor %}
+    </ul>
+	
+	</div>
+	{% elif mode == "thumb" %}
 	<div class="element-post-thumb">
 	
 	<div class="post-header">
@@ -35,8 +65,19 @@
 		<a href="https://furaffinity.net/view/{{ post.id }}">VIew on FA</a>
 	</div>
 	
-	<img class="media-thumb" src="http://192.168.0.138:1199/:6771/thumb/{{ post.id }}.{{ post.ext }}" loading="lazy">
+	<img class="media-thumb" src="http://127.0.0.1:6771/thumb/{{ post.id }}.{{ post.ext }}" loading="lazy">
+	{% endif %}
 	</div>
 	{% endfor %}
 </ul>
+
+<div class="page-nav">
+{% if page_no > 1 %}<a href="{{ url_for('uploader', uploader_name=uploader, page=page_no - 1) }}">&lt;</a>
+{% elif count > posts|length %}<a href="{{ url_for('uploader', uploader_name=uploader, page=page_max) }}">&gt;|</a>
+{% endif %}
+
+{% if page_max > page_no %}<a href="{{ url_for('uploader', uploader_name=uploader, mode=mode, page=page_no + 1) }}">&gt;</a>
+{% elif page_no > 1 %}<a href="{{ url_for('uploader', uploader_name=uploader, mode=mode, page=1) }}">|&lt;</a>
+{% endif %}
+</div>
 {% endblock %}

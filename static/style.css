@@ -99,3 +99,43 @@ input {
 	font-weight: bold;
 	padding: 3px 8px;
 }
+
+.page-nav a {
+	display: inline-block;
+	min-width: 1.8em;
+	margin: 0.5em;
+	padding: 0.5em;
+	cursor: pointer;
+    font-size: 24px;
+	color: var(--section-text)!important;
+	background-color: var(--section-bg);
+	line-height: 1em;
+}
+
+.desc {
+	text-align: initial;
+	max-width: 600px;
+	display: inline-block;
+	margin: 7pt auto;
+	overflow-wrap: break-word;
+}
+
+.desc span, .desc div, .desc i {
+	color: inherit!important;
+}
+
+.desc a {
+	font-size: 120%;
+	color: hsl(120, 41%, 43%);!important
+}
+
+.iconusername {
+	min-height: 50px;
+}
+
+.iconusername img {
+	color: transparent;
+	max-height: 50px;
+	max-width: 50px;
+	display: inline;
+}

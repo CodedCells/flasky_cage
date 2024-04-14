@@ -1,4 +1,5 @@
 from database import get_connection
+from sqlite3 import OperationalError
 
 def paginate_me(page, qty, count):
     start = page * qty
@@ -7,6 +8,7 @@ def paginate_me(page, qty, count):
         get += qty
     
     return start, get
+
 
 def other_paginate_me(page, qty, count):
     start = page * qty
@@ -17,6 +19,7 @@ def other_paginate_me(page, qty, count):
     
     return start, get
 
+
 class Tags:
     def __init__(self, tag, post_count, thumb_id):
         self.tag = tag
@@ -25,7 +28,7 @@ class Tags:
     
     @classmethod
     def get_tags(cls, page=0, qty=25):
-        temp_conn = get_connection('temp.db')
+        temp_conn = get_connection('db/temp.db')
         t = temp_conn.cursor()
         
         t.execute('''CREATE TABLE IF NOT EXISTS tag_counts (
@@ -79,10 +82,12 @@ class Tags:
         temp_conn.close()
         return [cls(*row) for row in rows], count
 
+
 class Uploader:
-    def __init__(self, uploader, post_count):
+    def __init__(self, uploader, post_count, sid):
         self.name = uploader
         self.post_count = post_count
+        self.thumb_id = sid
     
     @classmethod
     def get_uploaders(cls, page=0, qty=25):
@@ -97,7 +102,7 @@ class Uploader:
         start, qty = paginate_me(page, qty, unique)
         
         c.execute(f"""
-    SELECT uploader, COUNT(*) AS post_count
+    SELECT uploader, COUNT(*) AS post_count, MAX(id)
     FROM posts
     GROUP BY uploader
     ORDER BY post_count DESC
@@ -131,7 +136,21 @@ class Post:
         
         self.desclen = desclen
         self.descwords = descwords
-
+        
+        self.description = "Error."
+        desc_conn = get_connection('db/postdesc.db')
+        d = desc_conn.cursor()
+        
+        try:
+            d.execute("SELECT body FROM 'description' WHERE id=?", (post_id,))
+            row = d.fetchone()
+            if row:
+                self.description = row[0].replace('//a.furaffinity.net/', '//127.0.0.1:6953/avatar/').replace('//a.facdn.net/', '//127.0.0.1:6953/avatar/')
+        except OperationalError:
+            self.description = "Database missing."
+        
+        desc_conn.close()
+    
     @classmethod
     def get_by_id(cls, post_id):
         conn = get_connection()
@@ -148,7 +167,7 @@ class Post:
     def get_by_uploader(cls, uploader_name, page=0, qty=25):
         conn = get_connection()
         c = conn.cursor()
-        c.execute("SELECT * FROM posts WHERE uploader=?", (uploader_name,))
+        c.execute("SELECT * FROM posts WHERE uploader=? ORDER BY id", (uploader_name,))
         rows = c.fetchall()
         conn.close()
         
@@ -162,7 +181,7 @@ class Post:
         conn = get_connection()
         c = conn.cursor()
         
-        c.execute("SELECT * FROM posts WHERE tags LIKE ?", ('%'+tag_name+'%',))
+        c.execute("SELECT * FROM posts WHERE tags LIKE ? ORDER BY id", ('%'+tag_name+'%',))
         rows = c.fetchall()
         conn.close()
         

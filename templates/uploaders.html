@@ -6,25 +6,42 @@
 <i>{{ count }} uploaders saved</i>
 <i>presenting {{ uploaders|length }}</i>
 
-<br>
-<br>
-
+<div class="page-nav">
 {% if page_no > 1 %}
-<a href="{{ url_for('uploaders', page=1) }}">&lt;&lt; First</a>
-<a href="{{ url_for('uploaders', page=page_no - 1) }}">&lt; Previous</a>
+<a href="{{ url_for('uploaders', page=page_no - 1) }}">&lt;</a>
+{% elif count > posts|length %}
+<a href="{{ url_for('uploaders', page=page_max) }}">&gt;|</a>
 {% endif %}
 
 {% if page_max > page_no %}
-<a href="{{ url_for('uploaders', page=page_no + 1) }}">Next &gt;</a>
-<a href="{{ url_for('uploaders', page=page_max) }}">Last &gt;&gt;</a>
+<a href="{{ url_for('uploaders', page=page_no + 1) }}">&gt;</a>
+{% elif page_no > 1 %}
+<a href="{{ url_for('uploaders', page=1) }}">|&lt;</a>
 {% endif %}
-
-<br>
-<br>
+</div>
 
 <ul>
 	{% for uploader in uploaders %}
-	<li><a href="{{ url_for('uploader', uploader_name=uploader.name) }}">{{ uploader.name }} with {{ uploader.post_count }} posts</a></li>
+	<!--<li><a href="{{ url_for('uploader', uploader_name=uploader.name) }}">{{ uploader.name }} with {{ uploader.post_count }} posts</a></li>-->
+	<div class="element-post-thumb">
+	<a href="{{ url_for('uploader', uploader_name=uploader.name) }}">
+	<img class="media-thumb" src="http://127.0.0.1:6771/thumb/{{ uploader.thumb_id }}.jpg" loading="lazy">
+	{{ uploader.name }} - {{ uploader.post_count }}</a>
+	</div>
 	{% endfor %}
 </ul>
+
+<div class="page-nav">
+{% if page_no > 1 %}
+<a href="{{ url_for('uploaders', page=page_no - 1) }}">&lt;</a>
+{% elif count > posts|length %}
+<a href="{{ url_for('uploaders', page=page_max) }}">&gt;|</a>
+{% endif %}
+
+{% if page_max > page_no %}
+<a href="{{ url_for('uploaders', page=page_no + 1) }}">&gt;</a>
+{% elif page_no > 1 %}
+<a href="{{ url_for('uploaders', page=1) }}">|&lt;</a>
+{% endif %}
+</div>
 {% endblock %}

@@ -1,6 +1,6 @@
 import sqlite3
 
-DATABASE_NAME = 'posts.db'
+DATABASE_NAME = 'db/posts.db'
 
 def get_connection(name=DATABASE_NAME):
     return sqlite3.connect(name)

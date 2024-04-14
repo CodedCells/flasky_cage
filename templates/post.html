@@ -11,9 +11,16 @@
 		<a href="https://furaffinity.net/view/{{ post.id }}">VIew on FA</a>
 	</div>
 	
-	<img class="media-full" src="http://192.168.0.138:1199/:6771/image/{{ post.id }}.{{ post.ext }}" loading="lazy">
+	<img class="media-full" src="http://127.0.0.1:6771/image/{{ post.id }}.{{ post.ext }}" loading="lazy">
 	
 	<div class="post-info">
+	
+	<div class="desc">
+	{% if post.descwords > 450 %}
+	<details><summary>Description ({{ post.descwords }} words)</summary>
+	{% endif %}
+	{{ post.description | safe }}
+	</div>
 	
 	<ul class="link-things">
 		<span>Users:</span>
@@ -27,5 +34,5 @@
     </ul>
 	
 	</div>
-	</div>
+</div>
 {% endblock %}

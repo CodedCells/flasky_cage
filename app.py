@@ -69,12 +69,14 @@ def tags():
 @app.route('/user/<uploader_name>')
 def uploader(uploader_name):
     page_no = request.args.get('page', 1, type=int)
+    mode = request.args.get('mode', 'full', type=str)
     results = request.args.get('results', 25, type=int)
     posts, count = Post.get_by_uploader(uploader_name, page=page_no - 1, qty=results)
     page_max = int(count / results)
     
     return render_template(
         'uploader.html',
+        mode=mode,
         uploader=uploader_name,
         posts=posts,
         count=count,
@@ -85,12 +87,14 @@ def uploader(uploader_name):
 @app.route('/tag/<tag_name>')
 def tag(tag_name):
     page_no = request.args.get('page', 1, type=int)
+    mode = request.args.get('mode', 'full', type=str)
     results = request.args.get('results', 25, type=int)
     posts, count = Post.get_by_tag(tag_name, page=page_no - 1, qty=results)
     page_max = int(count / results)
     
     return render_template(
         'tag.html',
+        mode=mode,
         tag=tag_name,
         posts=posts,
         count=count,
@@ -101,4 +105,4 @@ def tag(tag_name):
 if __name__ == '__main__':
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.config['FLASK_RUN_EXTRA_FILES'] = True
-    app.run(host='192.168.0.138', port=8970)
+    app.run(host='127.0.0.1', port=8970)

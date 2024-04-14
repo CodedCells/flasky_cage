@@ -6,30 +6,42 @@
 <i>{{ count }} tags saved</i>
 <i>presenting {{ tags|length }}</i>
 
-<br>
-<br>
-
+<div class="page-nav">
 {% if page_no > 1 %}
-<a href="{{ url_for('tags', page=1) }}">&lt;&lt; First</a>
-<a href="{{ url_for('tags', page=page_no - 1) }}">&lt; Previous</a>
+<a href="{{ url_for('tags', page=page_no - 1) }}">&lt;</a>
+{% elif count > posts|length %}
+<a href="{{ url_for('tags', page=page_max) }}">&gt;|</a>
 {% endif %}
 
 {% if page_max > page_no %}
-<a href="{{ url_for('tags', page=page_no + 1) }}">Next &gt;</a>
-<a href="{{ url_for('tags', page=page_max) }}">Last &gt;&gt;</a>
+<a href="{{ url_for('tags', page=page_no + 1) }}">&gt;</a>
+{% elif page_no > 1 %}
+<a href="{{ url_for('tags', page=1) }}">|&lt;</a>
 {% endif %}
-
-<br>
-<br>
+</div>
 
 <ul>
 	{% for tag in tags %}
 	<!--<li><a href="{{ url_for('tag', tag_name=tag.tag) }}">{{ tag.tag }} with {{ tag.post_count }} posts</a></li>-->
 	<div class="element-post-thumb">
 	<a href="{{ url_for('tag', tag_name=tag.tag) }}">
-	<img class="media-thumb" src="http://192.168.0.138:1199/:6771/thumb/{{ tag.thumb_id }}.jpg" loading="lazy">
+	<img class="media-thumb" src="http://127.0.0.1:6771/thumb/{{ tag.thumb_id }}.jpg" loading="lazy">
 	{{ tag.tag }} - {{ tag.post_count }}</a>
 	</div>
 	{% endfor %}
 </ul>
+
+<div class="page-nav">
+{% if page_no > 1 %}
+<a href="{{ url_for('tags', page=page_no - 1) }}">&lt;</a>
+{% elif count > posts|length %}
+<a href="{{ url_for('tags', page=page_max) }}">&gt;|</a>
+{% endif %}
+
+{% if page_max > page_no %}
+<a href="{{ url_for('tags', page=page_no + 1) }}">&gt;</a>
+{% elif page_no > 1 %}
+<a href="{{ url_for('tags', page=1) }}">|&lt;</a>
+{% endif %}
+</div>
 {% endblock %}
