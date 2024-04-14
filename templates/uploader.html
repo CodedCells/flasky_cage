@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block title %}Posts by {{ uploader }}{% endblock %}
+
+{% block content %}
+<h1>Posts by {{ uploader }}</h1>
+<a href="https://furaffinity.net/user/{{ uploader }}">Fur Affinity Userpage</a> - 
+<i>{{ count }} posts saved</i>
+<i>presenting {{ posts|length }}</i>
+
+<br>
+<br>
+
+{% if page_no > 1 %}
+<a href="{{ url_for('uploader', uploader_name=uploader, page=1) }}">&lt;&lt; First</a>
+<a href="{{ url_for('uploader', uploader_name=uploader, page=page_no - 1) }}">&lt; Previous</a>
+{% endif %}
+
+{% if page_max > page_no %}
+<a href="{{ url_for('uploader', uploader_name=uploader, page=page_no + 1) }}">Next &gt;</a>
+<a href="{{ url_for('uploader', uploader_name=uploader, page=page_max) }}">Last &gt;&gt;</a>
+{% endif %}
+
+<br>
+<br>
+
+<ul>
+	{% for post in posts %}
+	<!--<li><a href="{{ url_for('post', post_id=post.id) }}">{{ post.title }} by {{ post.uploader }}</a></li>-->
+	<div class="element-post-thumb">
+	
+	<div class="post-header">
+		<h2 class="title"><a href="{{ url_for('post', post_id=post.id) }}">
+		{{ post.title }}
+		</a></h2>
+		<a href="https://furaffinity.net/view/{{ post.id }}">VIew on FA</a>
+	</div>
+	
+	<img class="media-thumb" src="http://192.168.0.138:1199/:6771/thumb/{{ post.id }}.{{ post.ext }}" loading="lazy">
+	</div>
+	{% endfor %}
+</ul>
+{% endblock %}

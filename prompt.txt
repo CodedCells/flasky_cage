@@ -1,0 +1,10 @@
+write a web server in python 3, make it read a ist of posts from a sqlite3 table.
+each post has a unique numerical ID, title, filename, uploader, tags (comma seperated string), and other contributing uploaders (also comma seperated string).
+
+please make it include the following pages:
+list of uploaders, sort it by the count of posts they've made, and show the most recent one as a thumbnail.
+a page for each uploader showing only their posts,
+another page for each uploader showing posts they've contributed to.
+a page for a specific post only.
+a page for each tag showing only posts with that tag,
+and a way to search for uploaders and tags to find matching results

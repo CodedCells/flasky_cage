@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h1>Flasky Cage</h1>
+<p>Quick and dirty Fur Affinity sqlite3 flask server</p>
+<br>
+<h2>Pages</h2>
+<p><a href="{{ url_for('uploaders') }}">List Uploaders</a></p>
+<p><a href="{{ url_for('tags') }}">List Tags</a></p>
+<br>
+<h2>Examples</h2>
+<p><a href="{{ url_for('uploader', uploader_name="codedcells") }}">User: CodedCells</a></p>
+<p><a href="{{ url_for('tag', tag_name="fexer") }}">Tag: Fexer</a></p>
+<p><a href="{{ url_for('post', post_id=38753295) }}">Post: Programming</a></p>
+<br>
+{% endblock %}

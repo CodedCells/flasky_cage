@@ -1,0 +1,30 @@
+{% extends "layout.html" %}
+{% block title %}Uploaders{% endblock %}
+
+{% block content %}
+<h1>Uploaders</h1>
+<i>{{ count }} uploaders saved</i>
+<i>presenting {{ uploaders|length }}</i>
+
+<br>
+<br>
+
+{% if page_no > 1 %}
+<a href="{{ url_for('uploaders', page=1) }}">&lt;&lt; First</a>
+<a href="{{ url_for('uploaders', page=page_no - 1) }}">&lt; Previous</a>
+{% endif %}
+
+{% if page_max > page_no %}
+<a href="{{ url_for('uploaders', page=page_no + 1) }}">Next &gt;</a>
+<a href="{{ url_for('uploaders', page=page_max) }}">Last &gt;&gt;</a>
+{% endif %}
+
+<br>
+<br>
+
+<ul>
+	{% for uploader in uploaders %}
+	<li><a href="{{ url_for('uploader', uploader_name=uploader.name) }}">{{ uploader.name }} with {{ uploader.post_count }} posts</a></li>
+	{% endfor %}
+</ul>
+{% endblock %}

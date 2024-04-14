@@ -1,0 +1,101 @@
+@import url("/static/reset.css");
+
+:root {
+	--body-bg: #000000;
+	--body-text: #BFBFBF;
+	--heading: #E8E8E8;
+	--section-bg: #141414;
+	--section-text: #7F8081;
+	
+	--accent: #EDD185;
+	--accent-dark: #E8BD70;
+	
+	--mark-button: #191919;
+	--mark-button-on: linear-gradient(45deg, var(--accent-dark) 0%, var(--accent) 100%);
+}
+
+.media-full {
+	max-width: 90vw;
+	margin: 0 auto;
+}
+
+a {
+	color: inherit!important;
+	text-decoration: none;
+}
+
+a[href^="https://www.furaffinity.net"]:visited {
+	color: var(--accent)!important;
+}
+
+body {
+	font-family: Roboto, sans-serif;
+	margin: 0;
+	min-width: fit-content;
+	max-width: 100vw;
+	
+	color: var(--body-text);
+	font-weight: 300;
+	background-color: var(--body-bg);
+	text-align: center;
+}
+
+h1, h2, h3, h4, h5 {
+	color: var(--heading)!important;
+	font-weight: 200;
+}
+
+input {
+	accent-color: var(--accent);
+}
+
+.element-post-full {
+	text-align: centre;
+}
+
+.element-post-thumb {
+	display: inline-block;
+	min-width: 200px;
+	vertical-align: top;
+	max-width: 30vw;
+	margin-bottom: 2em;
+	text-align: centre;
+}
+
+.element-post-thumb img {
+	margin: 0 auto;
+}
+
+.element-post-thumb .title {
+	font-size: initial;
+	max-width: 200px;
+	text-wrap: nowrap;
+	text-overflow: ellipsis;
+}
+
+.link-things {
+	display: flex;
+	flex-flow: wrap;
+	justify-content: center;
+	gap: 0.5em;
+	max-width: 90vw;
+	margin: 0 auto;
+	margin-bottom: 1em;
+}
+
+.link-things * {
+	display: flex;
+	list-style-type: none;
+}
+
+.link-things a {
+	background-color: var(--section-bg);
+	border-radius: 69em;
+	padding: 0.3em;
+	text-transform: capitalize;
+}
+
+.link-things .linkhead {
+	font-weight: bold;
+	padding: 3px 8px;
+}
