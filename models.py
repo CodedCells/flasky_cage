@@ -11,6 +11,9 @@ def paginate_me(page, qty, count):
 
 
 def other_paginate_me(page, qty, count):
+    if page is None:
+        return 0, None
+    
     start = page * qty
     get = qty + start
     
@@ -88,6 +91,16 @@ class Uploader:
         self.name = uploader
         self.post_count = post_count
         self.thumb_id = sid
+    
+    @classmethod
+    def get_just_uploaders(cis):
+        conn = get_connection()
+        c = conn.cursor()
+        
+        c.execute("CREATE INDEX IF NOT EXISTS idx_uploader ON posts(uploader)")
+        c.execute("SELECT DISTINCT uploader FROM posts")
+        
+        return [x[0] for x in c.fetchall()]
     
     @classmethod
     def get_uploaders(cls, page=0, qty=25):
@@ -173,6 +186,15 @@ class Post:
             self.description = "Database missing."
         
         desc_conn.close()
+    
+    @classmethod
+    def get_just_posts(cis):
+        conn = get_connection()
+        c = conn.cursor()
+        
+        c.execute("SELECT id FROM posts")
+        
+        return [x[0] for x in c.fetchall()]
     
     @classmethod
     def get_by_id(cls, post_id):

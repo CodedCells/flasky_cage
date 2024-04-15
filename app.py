@@ -1,4 +1,4 @@
-from flask import g, Flask, render_template, request
+from flask import g, Flask, render_template, request, jsonify
 from database import get_posts
 from models import Post, Uploader, Tags
 import timeit
@@ -110,6 +110,43 @@ def tag(tag_name):
         page_no=page_no,
         page_max=page_max
         )
+
+@app.route('/data', methods=['GET', 'POST'])
+def handle_post_request():
+    #data = request.json
+    
+    what = request.args.get('what', 'nothing', type=str)
+    which = request.args.get('which', 'nothing', type=str)
+    
+    response_data = {'error': f'Cannot resolve {what}'}
+    
+    if what == 'users':
+        response_data = Uploader.get_just_uploaders()
+    
+    elif what == 'posts':
+        response_data = Post.get_just_posts()
+    
+    elif what == 'user_posts':
+        posts, count = Post.get_by_uploader(which, None)
+        response_data = [x.id for x in posts]
+    
+    elif what == 'post_info':
+        response_data = {}
+        for i in which.split(','):
+            if not i:
+                continue
+            
+            data = Post.get_by_id(i)
+            if data:
+                data = vars(data)
+            response_data[i] = data
+        
+        if len(response_data) == 1:
+            response_data = data
+    
+    # Return a JSON response
+    return jsonify(response_data)
+
 
 if __name__ == '__main__':
     app.config['TEMPLATES_AUTO_RELOAD'] = True
