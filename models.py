@@ -111,6 +111,29 @@ class Uploader:
         
         conn.close()
         return [cls(*row) for row in rows], unique
+    
+    @classmethod
+    def get_stats(cis, uploader_name):
+        conn = get_connection('db/userstats.db')
+        c = conn.cursor()
+        
+        c.execute("SELECT * FROM users WHERE username is ? ORDER BY check_date DESC LIMIT 1", (uploader_name,))
+        result = c.fetchone()
+        print(result)
+        cis.name = result[0]
+        cis.print_name = result[1]
+        cis.check_date = result[2]
+        cis.registered_date = result[3]
+        cis.recent_post_id = result[4]
+        cis.recent_post_date = result[5]
+        cis.user_status = result[6]
+        cis.user_title = result[7]
+        cis.views = result[8]
+        cis.submissions = result[9]
+        cis.favs = result[10]
+        cis.trades_open = result[11]
+        cis.comms_open = result[12]
+        return cis
 
 
 class Post:

@@ -27,6 +27,13 @@ Served in {math.ceil(diff*1000):,}ms'''
     
     return response
 
+# Custom Jinja2 filter function to convert Unix timestamp to local date
+def unix_timestamp_to_local_date(timestamp):
+    utc_datetime = datetime.utcfromtimestamp(timestamp)
+    local_datetime = utc_datetime.replace(tzinfo=None)  # Assuming server is running in local timezone
+    formatted_date = local_datetime.strftime('%b %d, %Y %H:%M')
+    return formatted_date
+
 @app.route('/')
 def index():
     return render_template('index.html', posts=[])
@@ -72,6 +79,7 @@ def uploader(uploader_name):
     mode = request.args.get('mode', 'full', type=str)
     results = request.args.get('results', 25, type=int)
     posts, count = Post.get_by_uploader(uploader_name, page=page_no - 1, qty=results)
+    userstat = Uploader.get_stats(uploader_name)
     page_max = int(count / results)
     
     return render_template(
@@ -81,7 +89,8 @@ def uploader(uploader_name):
         posts=posts,
         count=count,
         page_no=page_no,
-        page_max=page_max
+        page_max=page_max,
+        userstat=userstat
         )
 
 @app.route('/tag/<tag_name>')
@@ -105,4 +114,5 @@ def tag(tag_name):
 if __name__ == '__main__':
     app.config['TEMPLATES_AUTO_RELOAD'] = True
     app.config['FLASK_RUN_EXTRA_FILES'] = True
+    app.jinja_env.filters['unix_to_local_date'] = unix_timestamp_to_local_date
     app.run(host='127.0.0.1', port=8970)

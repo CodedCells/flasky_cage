@@ -7,6 +7,15 @@
 <i>{{ count }} posts saved</i>
 <i>presenting {{ posts|length }}</i>
 
+<p>{{ userstat.user_title }}</p>
+<p>Registered: {{ userstat.registered_date|unix_to_local_date }}</p>
+<p>Checked: {{ userstat.check_date|unix_to_local_date }}</p>
+<p>Last posted: {{ userstat.recent_post_date|unix_to_local_date }}</p>
+{% if userstat.user_status != "regular" %}
+<p>{{ userstat.user_status }}</p>{% endif %}
+
+<p>{{ userstat.submissions }} submissions</p>
+
 <div class="page-nav">
 {% if page_no > 1 %}<a href="{{ url_for('uploader', uploader_name=uploader, mode=mode, page=page_no - 1) }}">&lt;</a>
 {% elif count > posts|length %}<a href="{{ url_for('uploader', uploader_name=uploader, mode=mode, page=page_max) }}">&gt;|</a>
