@@ -64,6 +64,7 @@ input {
 
 .element-post-thumb img {
 	margin: 0 auto;
+	max-width: 20vw;
 }
 
 .element-post-thumb .title {
@@ -138,4 +139,15 @@ input {
 	max-height: 50px;
 	max-width: 50px;
 	display: inline;
+}
+
+.niceinp { /* usually input elements */
+	font-size: 100%;
+	min-height: 25px;
+	border: none;
+	border-radius: 25px;
+	
+	background: var(--section-bg);
+	color: var(--section-text);
+	padding: 5px;
 }

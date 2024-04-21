@@ -23,6 +23,25 @@ def other_paginate_me(page, qty, count):
     return start, get
 
 
+def post_get_fail(cls, post_id):
+        row = [
+            post_id,
+            '.badart',
+            f'Unknown: {post_id}',
+            -1,
+            -1,
+            'png',
+            'unknown',
+            '',
+            '',
+            -1,
+            -1,
+            -1,
+            -1,
+            -1]
+        return cls(*row)
+
+
 class Tags:
     def __init__(self, tag, post_count, thumb_id):
         self.tag = tag
@@ -47,15 +66,20 @@ class Tags:
             c = conn.cursor()
             c.execute("SELECT tags, id, ext FROM posts")
             
-            posts = c.fetchall()
-            
             # Initialize a dictionary to store tag counts
             tag_counts = {}
             
             # Count the occurrences of each tag
-            for post in posts:
+            while True:
+                post = c.fetchone()
+                if not post:
+                    break
+                
                 tags = post[0].split(',')  # Split the comma-separated tags
                 for tag in tags:
+                    if not tag:
+                        continue
+                    
                     tag = tag.strip()  # Remove leading/trailing whitespace
                     if tag in tag_counts:
                         tag_counts[tag][0] += 1
@@ -162,10 +186,13 @@ class Post:
         self.ext = ext
         self.rating = rating
         
-        self.tags = tags.split(',')
+        self.tags = []
+        if tags:
+            self.tags = [x for x in tags.split(',') if x]
+        
         self.folders = []
         if folders:
-            self.folders = [int(x) for x in folders.split(',')]
+            self.folders = [int(x) for x in folders.split(',') if x]
         
         self.media_size = [media_width, media_height]
         self.media_bytes = media_bytes
@@ -186,6 +213,33 @@ class Post:
             self.description = "Database missing."
         
         desc_conn.close()
+		
+        self.link_to_posts = []
+        self.link_to_users = []
+        self.link_from = []
+        
+        link_conn = get_connection('db/postdesc_links.db')
+        d = link_conn.cursor()
+        try:
+            d.execute("SELECT linking FROM desc_posts WHERE origin=?", (post_id,))
+            row = d.fetchall()
+            if row:
+                self.link_to_posts = [x[0] for x in row]
+            
+            d.execute("SELECT origin FROM desc_posts WHERE linking=?", (post_id,))
+            row = d.fetchall()
+            if row:
+                self.link_from = [x[0] for x in row]
+                
+            d.execute("SELECT linking FROM desc_users WHERE origin=?", (post_id,))
+            row = d.fetchall()
+            if row:
+                self.link_to_users = [x[0] for x in row]
+        
+        except OperationalError:
+            pass
+        
+        link_conn.close()
     
     @classmethod
     def get_just_posts(cis):
@@ -197,17 +251,87 @@ class Post:
         return [x[0] for x in c.fetchall()]
     
     @classmethod
+    def get_linked_to(cis, post_id, page=0, qty=25):
+        conn = get_connection('db/postdesc_links.db')
+        c = conn.cursor()
+        
+        c.execute("SELECT linking FROM desc_posts WHERE origin=?", (post_id,))
+        
+        rows = c.fetchall()
+        conn.close()
+        
+        count = len(rows)
+        start, off = other_paginate_me(page, qty, count)
+        
+        return [x[0] for x in rows[start:off]], count
+    
+    @classmethod
+    def get_all_linked(cis, page=0, qty=25, include='all'):
+        conn = get_connection('db/postdesc_links.db')
+        c = conn.cursor()
+        
+        c.execute(f"SELECT DISTINCT linking FROM desc_posts ORDER BY linking DESC")
+        
+        rows = c.fetchall()
+        conn.close()
+        
+        if include != 'all':
+            conn = get_connection()
+            c = conn.cursor()
+            
+            c.execute("SELECT id FROM posts")
+            got = set(x[0] for x in c.fetchall())
+            
+            in_out = include == 'include'
+            rows = [x for x in rows if (x[0] in got) == in_out]
+        
+        conn.close()
+        
+        count = len(rows)
+        start, off = other_paginate_me(page, qty, count)
+        
+        return [x[0] for x in rows[start:off]], count
+    
+    @classmethod
+    def get_linked_from(cis, post_id, page=0, qty=25):
+        conn = get_connection('db/postdesc_links.db')
+        c = conn.cursor()
+        
+        c.execute("SELECT origin FROM desc_posts WHERE linking=?", (post_id,))
+        
+        rows = c.fetchall()
+        conn.close()
+        
+        count = len(rows)
+        start, off = other_paginate_me(page, qty, count)
+        
+        return [x[0] for x in rows[start:off]], count
+    
+    @classmethod
     def get_by_id(cls, post_id):
         conn = get_connection()
         c = conn.cursor()
-        c.execute("SELECT * FROM posts WHERE id=?", (post_id,))
-        row = c.fetchone()
-        conn.close()
-        if row:
-            return cls(*row)
         
-        return None
-
+        multi = type(post_id) == list
+        if not multi:
+            post_id = [post_id]
+        
+        placeholders = ','.join(['?'] * len(post_id))
+        
+        c.execute(f"SELECT * FROM posts WHERE id IN ({placeholders})", post_id)
+        rows = c.fetchall()
+        conn.close()
+        
+        if multi:
+            got = {row[0]: cls(*row) for row in rows}
+            
+            return [got.get(row, post_get_fail(cls, row)) for row in post_id]
+        
+        if not rows:
+            return post_get_fail(cls, post_id[0])
+        
+        return cls(*rows[0])
+    
     @classmethod
     def get_by_uploader(cls, uploader_name, page=0, qty=25):
         conn = get_connection()
@@ -226,7 +350,9 @@ class Post:
         conn = get_connection()
         c = conn.cursor()
         
-        c.execute("SELECT * FROM posts WHERE tags LIKE ? ORDER BY id", ('%'+tag_name+'%',))
+        tag_str = f'%,{tag_name},%'
+        
+        c.execute("SELECT * FROM posts WHERE tags LIKE ? ORDER BY id", (tag_str,))
         rows = c.fetchall()
         conn.close()
         

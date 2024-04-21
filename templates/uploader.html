@@ -53,15 +53,36 @@
 	</div>
 	
 	<ul class="link-things">
+		<span>Tags:</span>{% for tag in post.tags %}
+        <li><a href="{{ url_for('tag', tag_name=tag) }}">{{ tag }}</a></li>{% endfor %}
+    </ul>
+	
+	<ul class="link-things">
 		<span>Users:</span>
 		{% for user in post.users_mentioned %}
         <li><a href="{{ url_for('uploader', uploader_name=user) }}">{{ user }}</a></li>{% endfor %}
     </ul>
 	
+	{% if post.link_from %}
 	<ul class="link-things">
-		<span>Tags:</span>{% for tag in post.tags %}
-        <li><a href="{{ url_for('tag', tag_name=tag) }}">{{ tag }}</a></li>{% endfor %}
+		<a href="{{ url_for('linkfrom', what='post', thing=post.id) }}">Linkied from:</a>
+		{% for link_post_id in post.link_from %}
+        <li><a href="{{ url_for('post', post_id=link_post_id) }}">{{ link_post_id }}</a></li>{% endfor %}
     </ul>
+	{% endif %}
+	{% if post.link_to_posts %}
+	<ul class="link-things">
+		<a href="{{ url_for('linkto', what='post', thing=post.id) }}">Linking to:</a>
+		{% for link_post_id in post.link_to_posts %}
+        <li><a href="{{ url_for('post', post_id=link_post_id) }}">{{ link_post_id }}</a></li>{% endfor %}
+    </ul>
+	{% endif %}
+	{% if post.link_to_users %}
+	<ul class="link-things">
+		{% for link_user in post.link_to_users %}
+        <li><a href="{{ url_for('uploader', uploader_name=link_user) }}">{{ link_user }}</a></li>{% endfor %}
+    </ul>
+	{% endif %}
 	
 	</div>
 	{% elif mode == "thumb" %}

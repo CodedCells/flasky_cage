@@ -95,6 +95,77 @@ def uploader(uploader_name):
         userstat=userstat
         )
 
+@app.route('/linked')
+def linked():
+    page_no = request.args.get('page', 1, type=int)
+    mode = request.args.get('mode', 'full', type=str)
+    results = request.args.get('results', 25, type=int)
+    include = request.args.get('include', 'all', type=str)
+    
+    post_ids, count = Post.get_all_linked(page=page_no - 1, qty=results, include=include)
+    
+    posts = Post.get_by_id(post_ids)
+    print(len(post_ids), len(posts))
+    
+    page_max = int(count / results)
+    
+    return render_template(
+        'tag.html',
+        mode=mode,
+        tag=f'Linked',
+        posts=posts,
+        count=count,
+        page_no=page_no,
+        page_max=page_max
+        )
+
+@app.route('/linkro/<what>/<thing>')
+def linkto(what, thing):
+    page_no = request.args.get('page', 1, type=int)
+    mode = request.args.get('mode', 'full', type=str)
+    results = request.args.get('results', 25, type=int)
+    
+    post_ids, count = Post.get_linked_to(thing, page=page_no - 1, qty=results)
+    
+    posts = Post.get_by_id(post_ids)
+    
+    page_max = int(count / results)
+    
+    return render_template(
+        'tag.html',
+        mode=mode,
+        tag=f'Linking to {thing}',
+        posts=posts,
+        count=count,
+        page_no=page_no,
+        page_max=page_max
+        )
+
+@app.route('/linkfrom/<what>/<thing>')
+def linkfrom(what, thing):
+    page_no = request.args.get('page', 1, type=int)
+    mode = request.args.get('mode', 'full', type=str)
+    results = request.args.get('results', 25, type=int)
+    
+    post_ids, count = Post.get_linked_from(thing, page=page_no - 1, qty=results)
+    posts = []
+    for post_id in post_ids:
+        post = Post.get_by_id(post_id)
+        
+        posts.append(post)
+    
+    page_max = int(count / results)
+    
+    return render_template(
+        'tag.html',
+        mode=mode,
+        tag=f'Linked from {thing}',
+        posts=posts,
+        count=count,
+        page_no=page_no,
+        page_max=page_max
+        )
+
 @app.route('/tag/<tag_name>')
 def tag(tag_name):
     page_no = request.args.get('page', 1, type=int)
