@@ -1,0 +1,45 @@
+{% extends "layout.html" %}
+{% block title %}Query{% endblock %}
+
+{% block content %}
+<h1>Query</h1>
+<textarea id="query-input" class="niceinp"></textarea>
+<button class="niceinp" onclick="go_query()">Go</button>
+<script src="static/common.js"></script>
+<script>
+
+function query_back(response) {
+	const full_data = JSON.parse(this.responseText)
+	const results_box = document.getElementById("results");
+	results_box.innerHTML = "";
+	
+	for (var [post_id, data] of Object.entries(full_data)) {
+		if (post_id < 1) continue;
+		if (!data) data = {"titl": "bruh"}
+		'<a href="/view/' + post_id + '">'
+		//console.log(post_id, data);
+		var block = '<div class="element-post-thumb">';
+		block += '\n<div class="post-header">';
+		block += '\n<h2 class="title"><a href="/view/' + post_id + '">' + data.title + + '</a></h2>';
+		block += '\n<a href="https://furaffinity.net/view/' + post_id + '">VIew on FA</a></div>';
+		block += '<img class="media-thumb" src="http://127.0.0.1:6771/thumb/' + post_id + '.jpg" loading="lazy"></div>';
+		
+		results_box.innerHTML += block;
+	}
+}
+
+function go_query() {
+	var value = document.getElementById("query-input").value;
+	if (value.includes('\n'))
+		value = value.replaceAll('\n', ',')
+	
+	value = value.replaceAll(',,', ',')
+	if (!value.includes(','))
+		value += ',-1'
+	
+	send_xhr('/data?what=post_info', '{"which": "' + value  + '"}', query_back)
+}
+</script>
+<div id="results"></div>
+
+{% endblock %}

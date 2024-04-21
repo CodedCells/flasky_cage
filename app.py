@@ -4,6 +4,7 @@ from models import Post, Uploader, Tags
 import timeit
 import math
 from datetime import datetime
+import json
 
 app = Flask(__name__)
 
@@ -41,6 +42,7 @@ def index():
 @app.route('/view/<int:post_id>')
 def post(post_id):
     post = Post.get_by_id(post_id)
+    
     return render_template('post.html', post=post)
 
 @app.route('/users')
@@ -111,12 +113,21 @@ def tag(tag_name):
         page_max=page_max
         )
 
+@app.route('/query')
+def query():
+    return render_template('query.html')
+
 @app.route('/data', methods=['GET', 'POST'])
 def handle_post_request():
-    #data = request.json
+    try:
+        data = json.loads(request.data)
+    except:
+        data = {}
     
     what = request.args.get('what', 'nothing', type=str)
     which = request.args.get('which', 'nothing', type=str)
+    if 'which' in data:
+        which = data['which']
     
     response_data = {'error': f'Cannot resolve {what}'}
     
